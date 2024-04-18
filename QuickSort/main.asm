@@ -29,17 +29,9 @@ mov ebp,esp
 pushad
 
 ;body of quicksort
-;if(low<high)  cmp -> jmpcond
-;{
-;    // pi is the partition return index of pivot    
-;    int pi=partition(arr,low,high);    
-;    //Recursion Call
-;    //smaller element than pivot goes left and
-;    //higher element goes right
-;    quickSort(arr,low,pi-1);
-;    quickSort(arr,pi+1,high);
-;  }
 
+
+	;if(low<high)  cmp -> jmpcond
     mov eax,[ebp+12]   ; eax <- low
     cmp eax,[ebp+16]   ; compare low and high
     jnl L1             ; if low >= high then jump to L1
@@ -55,7 +47,6 @@ pushad
     push edi
     call partition    ; partition return value in eax
 
-
 ;    quickSort(arr,low,pi-1);
 	mov ebx,eax ; ebx <- pi
     dec ebx     ; ebx <- pi-1
@@ -63,7 +54,6 @@ pushad
     push esi
     push edi
     call quickSort
-
 
 ;    quickSort(arr,pi+1,high);
     mov ebx,eax ; ebx <- pi
