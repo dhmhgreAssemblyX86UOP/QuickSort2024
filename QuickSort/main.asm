@@ -1,4 +1,4 @@
-TITLE  Quick Sort Algorithm Implementation from https://www.geeksforgeeks.org/quick-sort/
+TITLE Quick Sort Algorithm Implementation from https://www.geeksforgeeks.org/quick-sort/
 ; Animated Quick Sort Execution https://www.youtube.com/watch?v=WprjBK0p6rw
 INCLUDE Irvine32.inc
 .data
