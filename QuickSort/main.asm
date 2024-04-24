@@ -1,10 +1,9 @@
-TITLE MASM Skeleton Project
+TITLE  Quick Sort Algorithm Implementation from https://www.geeksforgeeks.org/quick-sort/
 INCLUDE Irvine32.inc
-
-
 .data
 
-array SDWORD 10,7,8,9,1,5
+array SDWORD 10h,80h,30h,90h,40h,50h,70h
+;array SDWORD 10,80,30,90,40,50,70
 len = LENGTHOF array
 message BYTE "Sorted Array:",0
 seperator BYTE  ", ",0
@@ -18,6 +17,11 @@ seperator BYTE  ", ",0
 ;	*a=*b;
 ;	*b=t;
 ;}
+; -- Swap function --
+; Description : This function swaps the values of two integers given as pointers.
+; Input : EBP+8 -> Pointer to the first integer
+;         EBP+12 -> Pointer to the second integer
+; Output : The values of the two integers are swapped.
 swap PROC
 push ebp
 mov ebp,esp
@@ -46,20 +50,25 @@ swap ENDP
 partition PROC
 push ebp
 mov ebp,esp
-pushad
+push ebx
+push ecx
+push edx
+push edi
+push esi
 
 ; edi : array address
 ; ebx : pivot
 ; edx : i
 
-
-
 ;//choose the pivot   
 ;  int pivot=arr[high];  ebx <- pivot
    mov edi,[ebp+8]    ; edi <- arr address
-   mov esi,[ebp+16]   ; esi <- high]
-   shl esi,2
-   mov ebx,[edi + esi]
+   mov esi,[ebp+16]   ; esi <- high
+   mov ebx,[edi + esi*4]     ; **checked**
+   
+   ; ebx <- pivot
+   ; edi <- arr address
+   ; esi <- high
 
 
 ;  //Index of smaller element and Indicate
@@ -68,12 +77,24 @@ pushad
    mov edx,[ebp+12]
    dec edx
 
+   ; ebx <- pivot
+   ; edi <- arr address
+   ; esi <- high
+   ; edx <- i = low-1
 
    mov ecx,[ebp+16]
    sub ecx,[ebp+12] ; ecx <- high-low
    inc ecx          ; ecx <- high-low+1
    mov eax,[ebp+12] ; eax <- j = low
 L1: ;  for(int j=low;j<=high;j++)  high-low+1
+
+
+   ; ebx <- pivot
+   ; edi <- arr address
+   ; esi <- high
+   ; edx <- i = low-1
+   ; eax <- j = low
+
 
     ;if(arr[j]<pivot)
     cmp [edi+eax*4],ebx
@@ -84,28 +105,46 @@ L1: ;  for(int j=low;j<=high;j++)  high-low+1
     ;i++;
     inc edx
 
-    ;xchg [edi+edx*4],[edi+eax*4]
+   ; ebx <- pivot
+   ; edi <- arr address
+   ; esi <- high
+   ; edx <- i +1
+   ; eax <- j = low
 
+    ;swap(arr[i],arr[j]);
+    push esi
+    push eax
+    lea esi,[edi+edx*4] ; esi <- &arr[i]
+    lea eax,[edi+eax*4] ; edi <- &arr[j]
+    push esi
+    push eax
+    call swap
+    pop eax
+    pop esi
 
-
+    
 L2:
+    inc eax   ; j++
     loop L1
 
-  
-;  for(int j=low;j<=high;j++)  high-low+1
-;  {
-;    //If current element is smaller than the pivot
-;    if(arr[j]<pivot)
-;    {
-;      //Increment index of smaller element
-;      i++;
-;      swap(arr[i],arr[j]);
-;    }
-;  }
-;  swap(arr[i+1],arr[high]);
-;  return (i+1);
+    ;swap(arr[i+1],arr[high]);
+    inc edx
+    lea esi,[edi+edx*4] ; esi <- &arr[i+1]
+    mov ebx,[ebp+16]    ; esi <- high
+    lea eax,[edi+ebx*4] ; edi <- &arr[high]
+    push esi
+    push eax
+    call swap
 
-popad
+
+    ; return (i+1);
+    mov eax,edx
+  
+pop esi
+pop edi
+pop edx
+pop ecx
+pop ebx
 mov esp,ebp
 pop ebp
 ret 12
@@ -163,7 +202,13 @@ ret 12
 quicksort ENDP
 
 main PROC
-   
+
+    ; Swap test code
+    ;mov esi,OFFSET array
+	;push esi ; 1st element
+    ;add esi,4
+    ;push esi ; 2nd element
+    ;call swap        
     push DWORD PTR len-1
     push DWORD PTR 0
 	push OFFSET array
@@ -177,7 +222,7 @@ main PROC
 PRINT:
     mov eax,array[esi]
     add esi,4
-    call WriteInt
+    call WriteHex
     mov edx,OFFSET seperator
     call WriteString
     loop PRINT
